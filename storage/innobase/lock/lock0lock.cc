@@ -1272,6 +1272,30 @@ lock_rec_expl_exist_on_page(
 }
 
 /*********************************************************************//**
+Determines if there are explicit record locks on a page.
+@return	an explicit record lock on the page or couldn't get lock_sys mutex, or NULL if there are none */
+UNIV_INTERN
+bool
+lock_rec_expl_exist_on_page_nowait(
+/*========================*/
+	ulint	space,	/*!< in: space id */
+	ulint	page_no)/*!< in: page number */
+{
+	lock_t*	lock;
+
+	if(lock_mutex_enter_nowait()){
+		// Lock failed, just ignore this page
+		// Let's assume this page has locked row
+		return true;
+	}else{
+		lock = lock_rec_get_first_on_page_addr(space, page_no);
+		lock_mutex_exit();
+	}
+
+	return(lock!=NULL);
+}
+
+/*********************************************************************//**
 Gets the first record lock on a page, where the page is identified by a
 pointer to it.
 @return	first lock, NULL if none exists */

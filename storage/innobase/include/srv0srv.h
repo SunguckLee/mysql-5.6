@@ -380,6 +380,9 @@ extern double	srv_defragment_fill_factor;
 extern uint	srv_defragment_frequency;
 extern ulonglong	srv_defragment_interval;
 
+/* delete TTL expired row */
+extern my_bool  srv_delete_expired_row;
+
 extern ulint	srv_idle_flush_pct;
 
 /*!< page_cleaner_thread should run once per this many milliseconds */
@@ -1199,6 +1202,11 @@ struct export_var_t{
 	ulint innodb_defragment_compression_failures;
 	ulint innodb_defragment_failures;
 	ulint innodb_defragment_count;
+
+	ulint innodb_ttl_expire_scan_rows; /*!< btr_ttl_expire_scan_rows */
+	ulint innodb_ttl_expired_rows;     /*!< btr_ttl_expired_rows */
+	ulint innodb_skip_ttl_expire_pages;/*!< btr_skip_ttl_expire_pages */
+	ulint innodb_skip_ttl_expire_rows; /*!< btr_skip_ttl_expire_rows */
 
 	ulint innodb_buffered_aio_submitted;
 	ulint innodb_outstanding_aio_requests;

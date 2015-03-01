@@ -260,6 +260,8 @@ UNIV_INTERN uint	srv_defragment_frequency =
 	SRV_DEFRAGMENT_FREQUENCY_DEFAULT;
 UNIV_INTERN ulonglong	srv_defragment_interval = 0;
 
+/* delete TTL expired row */
+UNIV_INTERN my_bool srv_delete_expired_row = FALSE;
 
 UNIV_INTERN ulint	srv_idle_flush_pct = 100;
 
@@ -2048,6 +2050,11 @@ srv_export_innodb_status(void)
 		btr_defragment_compression_failures;
 	export_vars.innodb_defragment_failures = btr_defragment_failures;
 	export_vars.innodb_defragment_count = btr_defragment_count;
+
+	export_vars.innodb_ttl_expire_scan_rows = btr_ttl_expire_scan_rows;
+	export_vars.innodb_ttl_expired_rows = btr_ttl_expired_rows;
+	export_vars.innodb_skip_ttl_expire_pages = btr_skip_ttl_expire_pages;
+	export_vars.innodb_skip_ttl_expire_rows = btr_skip_ttl_expire_rows;
 
 	export_vars.innodb_buffered_aio_submitted =
 		srv_stats.n_aio_submitted;

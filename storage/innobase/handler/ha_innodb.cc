@@ -1000,6 +1000,16 @@ static SHOW_VAR innodb_status_variables[]= {
    (char*) &export_vars.innodb_defragment_compression_failures, SHOW_LONG},
   {"defragment_failures",
    (char*) &export_vars.innodb_defragment_failures, SHOW_LONG},
+
+   {"ttl_expire_scan_rows",
+    (char*) &export_vars.innodb_ttl_expire_scan_rows, SHOW_LONG},
+   {"ttl_expired_rows",
+    (char*) &export_vars.innodb_ttl_expired_rows, SHOW_LONG},
+   {"skip_ttl_expire_pages",
+    (char*) &export_vars.innodb_skip_ttl_expire_pages, SHOW_LONG},
+   {"skip_ttl_expire_rows",
+    (char*) &export_vars.innodb_skip_ttl_expire_rows, SHOW_LONG},
+
   {"defragment_count",
    (char*) &export_vars.innodb_defragment_count, SHOW_LONG},
   {"buffered_aio_submitted",
@@ -17986,6 +17996,16 @@ static MYSQL_SYSVAR_DOUBLE(segment_reserve_factor, fseg_reserve_factor,
   " use unused pages of the segment.",
   NULL, NULL, 0.01, 0.0003, 0.4, 0);
 
+static MYSQL_SYSVAR_BOOL(zero_delete, page_zero_delete,
+       PLUGIN_VAR_OPCMDARG,
+  "Enables/disables overwriting zero on deleted record area.",
+  NULL, NULL, FALSE);
+
+static MYSQL_SYSVAR_BOOL(delete_expired_row, srv_delete_expired_row,
+       PLUGIN_VAR_OPCMDARG,
+  "Enables/disables delete TTL expired row during defragmentation.",
+  NULL, NULL, FALSE);
+
 static MYSQL_SYSVAR_LONG(additional_mem_pool_size, innobase_additional_mem_pool_size,
   PLUGIN_VAR_RQCMDARG | PLUGIN_VAR_READONLY,
   "DEPRECATED. This option may be removed in future releases, "
@@ -18907,6 +18927,8 @@ static struct st_mysql_sys_var* innobase_system_variables[]= {
   MYSQL_SYSVAR(io_capacity_max),
   MYSQL_SYSVAR(idle_flush_pct),
   MYSQL_SYSVAR(page_cleaner_interval_millis),
+  MYSQL_SYSVAR(zero_delete),
+  MYSQL_SYSVAR(delete_expired_row),
   MYSQL_SYSVAR(monitor_enable),
   MYSQL_SYSVAR(monitor_disable),
   MYSQL_SYSVAR(monitor_reset),

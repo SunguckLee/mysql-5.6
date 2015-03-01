@@ -34,6 +34,8 @@ Created 10/4/1994 Heikki Tuuri
 #include "data0data.h"
 #include "mtr0mtr.h"
 
+/* Overwriting zero on deleted-record area. */
+extern my_bool page_zero_delete;
 
 #define PAGE_CUR_ADAPT
 

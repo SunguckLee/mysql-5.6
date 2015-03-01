@@ -42,6 +42,9 @@ Created 10/4/1994 Heikki Tuuri
 static ulint	page_cur_short_succ	= 0;
 # endif /* UNIV_SEARCH_PERF_STAT */
 
+/* Wether overwrite zero on deleted record or not */
+UNIV_INTERN my_bool page_zero_delete = FALSE;
+
 /*******************************************************************//**
 This is a linear congruential generator PRNG. Returns a pseudo random
 number between 0 and 2^64-1 inclusive. The formula and the constants
@@ -2010,6 +2013,9 @@ page_cur_delete_rec(
 	ulint		cur_n_owned;
 	rec_t*		rec;
 
+	my_bool overwrite_zero_on_deleted_row = page_zero_delete; // This can be changed during processing this method, so used copy system variable
+	byte *rec_byte_start, *rec_byte_end;
+
 	page = page_cur_get_page(cursor);
 	page_zip = page_cur_get_page_zip(cursor);
 
@@ -2031,6 +2037,12 @@ page_cur_delete_rec(
 
 	/* The record must not be the supremum or infimum record. */
 	ut_ad(page_rec_is_user_rec(current_rec));
+
+	if(overwrite_zero_on_deleted_row){
+		// rec_byte_start = rec_get_start(current_rec, offsets); // This is record-header start
+		rec_byte_start = current_rec; // This is record-data start
+		rec_byte_end = rec_get_end(current_rec, offsets);
+	}
 
 	if (page_get_n_recs(page) == 1 && !recv_recovery_is_on()) {
 		/* Empty the page, unless we are applying the redo log
@@ -2131,6 +2143,11 @@ page_cur_delete_rec(
 
 	if (UNIV_UNLIKELY(page_zip_debug)) {
 		ut_a(!page_zip || page_zip_validate(page_zip, page, index));
+	}
+
+	// Zero set for deleted record area
+	if(overwrite_zero_on_deleted_row){
+		memset((void*)rec_byte_start, 0, (rec_byte_end - rec_byte_start));
 	}
 }
 
